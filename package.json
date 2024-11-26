@@ -22,7 +22,7 @@
     "@react-navigation/native": "^7.0.0",
     "@rneui/base": "4.0.0-rc.8",
     "@rneui/themed": "4.0.0-rc.8",
-    "eas-cli": "^13.2.3",
+    "eas-cli": "13.3.0",
     "expo": "~52.0.7",
     "expo-asset": "^11.0.1",
     "expo-blur": "~14.0.1",
