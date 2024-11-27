@@ -4,6 +4,7 @@
     "slug": "fit-bod",
     "version": "1.0.0",
     "orientation": "portrait",
+    "owner": "richiehuahua",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
