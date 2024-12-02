@@ -1,7 +1,10 @@
+import { useStyles } from '@/constants/Themes';
 import { ListItem, Text, Icon } from '@rneui/themed';
 import { View } from 'react-native';
 
 export const DashboardWorkouts = () => {
+  const styles = useStyles();
+
   const listArr = [
     {
       id: 123,
@@ -48,16 +51,16 @@ export const DashboardWorkouts = () => {
   ];
 
   return (
-    <View style={{ backgroundColor: 'teal' }}>
-      <Text h3>Workouts</Text>
-      <View>
+    <View>
+      <Text h4>Workouts</Text>
+      <View style={styles.dashboardListContainer}>
         {listArr.map((l, i) => (
           <ListItem key={i} bottomDivider>
             <ListItem.Content>
               <ListItem.Title>{l.name}</ListItem.Title>
             </ListItem.Content>
             <ListItem.Content right>
-              <Icon name="arrow-forward" type="ionicon" size={15} />
+              <Icon name="arrow-forward" type="ionicon" size={15} style={styles.sidebarIcon} />
             </ListItem.Content>
           </ListItem>
         ))}
