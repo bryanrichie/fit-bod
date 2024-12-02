@@ -1,14 +1,15 @@
+import { useStyles } from '@/constants/Themes';
 import { Icon } from '@rneui/themed';
 import { View } from 'react-native';
 
 export const Sidebar = () => {
+  const styles = useStyles();
+
   return (
-    <View
-      style={{ outline: 'solid', width: 50, gap: 10, backgroundColor: 'teal', paddingVertical: 10 }}
-    >
-      <Icon name="home" type="ionicon" style={{ padding: 10 }} />
-      <Icon name="barbell" type="ionicon" style={{ padding: 10 }} />
-      <Icon name="time" type="ionicon" style={{ padding: 10 }} />
+    <View style={styles.sidebar}>
+      <Icon name="home" type="ionicon" style={styles.sidebarIcon} />
+      <Icon name="barbell" type="ionicon" style={styles.sidebarIcon} />
+      <Icon name="time" type="ionicon" style={styles.sidebarIcon} />
     </View>
   );
 };
