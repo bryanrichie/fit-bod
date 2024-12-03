@@ -1,18 +1,23 @@
 import { Dashboard } from '@/components/Dashboard';
 import { Sidebar } from '@/components/Sidebar';
-import { Text, View } from 'react-native';
+import { makeStyles } from '@rneui/themed';
+import { View } from 'react-native';
 
 export default function Index() {
+  const styles = useStyles();
+
   return (
-    <View
-      style={{
-        flex: 1,
-        flexDirection: 'row',
-        marginRight: 50,
-      }}
-    >
+    <View style={styles.container}>
       <Sidebar />
       <Dashboard />
     </View>
   );
 }
+
+const useStyles = makeStyles((theme) => ({
+  container: {
+    flex: 1,
+    flexDirection: 'row',
+    marginRight: 50,
+  },
+}));
