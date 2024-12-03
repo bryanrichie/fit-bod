@@ -1,12 +1,26 @@
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { DashboardWorkouts } from './DashboardWorkouts';
 import { DashboardWorkoutHistory } from './DashboardWorkoutHistory';
+import { makeStyles } from '@rneui/themed';
 
 export const Dashboard = () => {
+  const styles = useStyles();
+
   return (
-    <View style={{ backgroundColor: 'grey', width: '100%', padding: 10, gap: 50 }}>
+    <View style={styles.container}>
       <DashboardWorkouts />
       <DashboardWorkoutHistory />
     </View>
   );
 };
+
+const useStyles = makeStyles((theme) => ({
+  container: {
+    backgroundColor: 'white',
+    width: '100%',
+    paddingTop: 15,
+    paddingLeft: 25,
+    paddingRight: 10,
+    gap: 10,
+  },
+}));
