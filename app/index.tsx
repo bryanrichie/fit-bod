@@ -1,8 +1,7 @@
 import { Dashboard } from '@/components/Dashboard';
 import { Sidebar } from '@/components/Sidebar';
-import { useStyles } from '@/constants/Themes';
-
-import { Text, View } from 'react-native';
+import { makeStyles } from '@rneui/themed';
+import { View } from 'react-native';
 
 export default function Index() {
   const styles = useStyles();
@@ -14,3 +13,11 @@ export default function Index() {
     </View>
   );
 }
+
+const useStyles = makeStyles((theme) => ({
+  container: {
+    flex: 1,
+    flexDirection: 'row',
+    marginRight: 50,
+  },
+}));

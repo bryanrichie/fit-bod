@@ -1,6 +1,5 @@
 import { View } from 'react-native';
-import { ListItem, Text, Icon } from '@rneui/themed';
-import { useStyles } from '@/constants/Themes';
+import { ListItem, Text, Icon, makeStyles } from '@rneui/themed';
 
 export const DashboardWorkoutHistory = () => {
   const styles = useStyles();
@@ -53,9 +52,9 @@ export const DashboardWorkoutHistory = () => {
   ];
 
   return (
-    <View>
+    <View style={styles.container}>
       <Text h4>History</Text>
-      <View style={styles.dashboardListContainer}>
+      <View style={styles.listContainer}>
         {listArr.map((l, i) => (
           <ListItem key={i} bottomDivider>
             <ListItem.Content>
@@ -63,7 +62,7 @@ export const DashboardWorkoutHistory = () => {
               <ListItem.Subtitle>{l.date.toDateString()}</ListItem.Subtitle>
             </ListItem.Content>
             <ListItem.Content right>
-              <Icon name="arrow-forward" type="ionicon" size={15} style={styles.sidebarIcon} />
+              <Icon name="arrow-forward" type="ionicon" size={15} />
             </ListItem.Content>
           </ListItem>
         ))}
@@ -71,3 +70,12 @@ export const DashboardWorkoutHistory = () => {
     </View>
   );
 };
+
+const useStyles = makeStyles((theme) => ({
+  container: {
+    gap: 5,
+  },
+  listContainer: {
+    borderWidth: 1,
+  },
+}));
