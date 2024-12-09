@@ -1,6 +1,6 @@
 import { View } from 'react-native';
-import { DashboardWorkouts } from './DashboardWorkouts';
-import { DashboardWorkoutHistory } from './DashboardWorkoutHistory';
+import { Workouts } from './Workouts';
+import { WorkoutHistory } from './WorkoutHistory';
 import { makeStyles } from '@rneui/themed';
 
 export const Dashboard = () => {
@@ -8,8 +8,8 @@ export const Dashboard = () => {
 
   return (
     <View style={styles.container}>
-      <DashboardWorkouts />
-      <DashboardWorkoutHistory />
+      <Workouts />
+      <WorkoutHistory />
     </View>
   );
 };
