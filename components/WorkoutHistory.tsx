@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import { ListItem, Text, Icon, makeStyles } from '@rneui/themed';
 
-export const DashboardWorkoutHistory = () => {
+export const WorkoutHistory = () => {
   const styles = useStyles();
 
   const listArr = [
