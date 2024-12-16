@@ -8,7 +8,7 @@ export default function Tab() {
   const [visible, setVisible] = useState<boolean>(false);
 
   const handleToggleOverlay = () => {
-    setVisible(!visible);
+    setVisible((prev) => !prev);
   };
 
   return (

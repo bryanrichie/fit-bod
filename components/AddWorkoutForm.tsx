@@ -2,27 +2,43 @@ import { View, StyleSheet } from 'react-native';
 import { Button, Overlay, Text, Input, Divider, ListItem } from '@rneui/themed';
 import { useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { capitaliseWords } from '@/hooks/utils';
+import { titleizeString } from '@/hooks/utils';
+import { useForm, Controller, useFieldArray } from 'react-hook-form';
 
 interface Props {
   visible: boolean;
   handleToggleOverlay: () => void;
 }
 
+type WorkoutType = {
+  workoutName: string;
+  exercises: { name: string }[];
+};
+
 export const AddWorkoutFormOverlay = ({ visible, handleToggleOverlay }: Props) => {
-  const [workoutName, setWorkoutName] = useState<string>('');
-  const [exercises, setExercises] = useState<string[]>([]);
-  const [newExercise, setNewExercise] = useState<string>('');
+  const { control, handleSubmit, watch } = useForm<WorkoutType>();
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'exercises',
+  });
+  const workoutName = watch('workoutName');
+  const [newExerciseName, setNewExerciseName] = useState<string>('');
+  const [savedWorkout, setSavedWorkout] = useState<WorkoutType>({ workoutName: '', exercises: [] });
+
+  const handleOnSubmit = (data: WorkoutType) => {
+    console.log('Saved workout:', data);
+    setSavedWorkout(data);
+  };
 
   const handleAddNewExercise = () => {
-    if (newExercise) {
-      setExercises([...exercises, capitaliseWords(newExercise)]);
-      setNewExercise('');
+    if (newExerciseName) {
+      append({ name: titleizeString(newExerciseName) });
+      setNewExerciseName('');
     }
   };
 
-  const handleRemoveNewExercise = (index: number) => {
-    setExercises(exercises.filter((_, i) => i !== index));
+  const handleRemoveExercise = (index: number) => {
+    remove(index);
   };
 
   return (
@@ -31,20 +47,24 @@ export const AddWorkoutFormOverlay = ({ visible, handleToggleOverlay }: Props) =
       <Divider style={styles.divider} />
       <View style={styles.container}>
         <View>
-          <Input
-            placeholder="Name your workout"
-            value={workoutName}
-            onChangeText={setWorkoutName}
+          <Controller
+            control={control}
+            render={({ field }) => <Input {...field} placeholder="Name your workout" />}
+            name="workoutName"
           />
+          <Text>{workoutName}</Text>
+          {savedWorkout.exercises.map((exercise) => (
+            <Text>{exercise.name}</Text>
+          ))}
           <View style={styles.listContainer}>
-            {exercises.map((exercise, i) => (
-              <ListItem key={i} containerStyle={styles.listItem}>
+            {fields.map((exercise, index) => (
+              <ListItem key={exercise.id} containerStyle={styles.listItem}>
                 <ListItem.Content>
-                  <ListItem.Title>{exercise}</ListItem.Title>
+                  <ListItem.Title>{exercise.name}</ListItem.Title>
                 </ListItem.Content>
                 <ListItem.Content right>
-                  <Button type="clear" onPress={() => handleRemoveNewExercise(i)}>
-                    <Ionicons name="close" size={20} style={styles.icon} />
+                  <Button type="clear" onPress={() => handleRemoveExercise(index)}>
+                    <Ionicons name="close" style={styles.icon} />
                   </Button>
                 </ListItem.Content>
               </ListItem>
@@ -53,13 +73,13 @@ export const AddWorkoutFormOverlay = ({ visible, handleToggleOverlay }: Props) =
           <Input
             placeholder="Add an exercise"
             style={styles.exerciseInput}
-            onChangeText={setNewExercise}
-            value={newExercise}
+            onChangeText={setNewExerciseName}
+            value={newExerciseName}
           />
           <Button title="Add Exercise" type="clear" onPress={handleAddNewExercise} />
         </View>
         <View style={styles.footerButtonContainer}>
-          <Button title="Finish" />
+          <Button title="Finish" onPress={handleSubmit(handleOnSubmit)} />
           <Button title="Cancel" onPress={handleToggleOverlay} />
         </View>
       </View>

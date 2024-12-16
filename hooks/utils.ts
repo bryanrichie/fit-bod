@@ -1,6 +1,5 @@
-export const capitaliseWords = (str: string) => {
-  return str
-    .split(' ')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+import { titleize } from 'inflection';
+
+export const titleizeString = (str: string) => {
+  return titleize(str);
 };
