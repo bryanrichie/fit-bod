@@ -16,7 +16,12 @@ type WorkoutType = {
 };
 
 export const AddWorkoutFormOverlay = ({ visible, handleToggleOverlay }: Props) => {
-  const { control, handleSubmit, watch } = useForm<WorkoutType>();
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<WorkoutType>();
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'exercises',
@@ -49,13 +54,18 @@ export const AddWorkoutFormOverlay = ({ visible, handleToggleOverlay }: Props) =
         <View>
           <Controller
             control={control}
-            render={({ field }) => <Input {...field} placeholder="Name your workout" />}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                placeholder="Name your workout"
+                onChangeText={onChange}
+                onBlur={onBlur}
+                value={value}
+              />
+            )}
             name="workoutName"
+            rules={{ required: 'You must enter a name for the workout' }}
           />
-          <Text>{workoutName}</Text>
-          {savedWorkout.exercises.map((exercise) => (
-            <Text>{exercise.name}</Text>
-          ))}
+          {errors.workoutName && <Text>{errors.workoutName.message}</Text>}
           <View style={styles.listContainer}>
             {fields.map((exercise, index) => (
               <ListItem key={exercise.id} containerStyle={styles.listItem}>
