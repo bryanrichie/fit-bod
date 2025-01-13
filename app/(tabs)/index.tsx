@@ -5,8 +5,9 @@ import { useState } from 'react';
 import { AddWorkoutFormOverlay } from '@/components/AddWorkoutForm';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+const queryClient = new QueryClient();
+
 export default function Tab() {
-  const queryClient = new QueryClient();
   const [visible, setVisible] = useState<boolean>(false);
 
   const handleToggleOverlay = () => {
@@ -14,13 +15,13 @@ export default function Tab() {
   };
 
   return (
-    <View style={styles.container}>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <View style={styles.container}>
         <Workouts />
         <Button title="Add Workout" onPress={handleToggleOverlay} />
         <AddWorkoutFormOverlay visible={visible} handleToggleOverlay={handleToggleOverlay} />
-      </QueryClientProvider>
-    </View>
+      </View>
+    </QueryClientProvider>
   );
 }
 

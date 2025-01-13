@@ -1,37 +1,38 @@
 import { ListItem, Text, Icon, makeStyles } from '@rneui/themed';
-import { View, Alert } from 'react-native';
-import { useEffect, useState } from 'react';
-import { getAllWorkouts, handleClearWorkouts } from '../hooks/db';
+import { View, Button, ScrollView, RefreshControl } from 'react-native';
+import { getAllWorkouts, clearAllWorkouts } from '../hooks/db';
 import { WorkoutsType } from '@/hooks/types';
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { workoutsQueryKey } from '@/hooks/utils';
+import { useCallback, useState } from 'react';
 
 export const Workouts = () => {
-  // const queryClient = useQueryClient();
+  const [refreshing, setRefreshing] = useState(false);
   const styles = useStyles();
   const {
     data: workouts,
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery<WorkoutsType>({
-    queryKey: ['workouts'],
+    queryKey: [workoutsQueryKey],
     queryFn: getAllWorkouts,
+    refetchOnWindowFocus: true,
   });
-  // const [workouts, setWorkouts] = useState<WorkoutsType | undefined>();
 
-  // useEffect(() => {
-  //   handleClearWorkouts();
-  // }, []);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    refetch();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
-  // queryClient.invalidateQueries({ queryKey: ['workouts'] });
-
-  console.log('workouts:', workouts);
+  const handleClearAllWorkouts = async () => {
+    await clearAllWorkouts();
+    refetch();
+  };
 
   if (isError) {
     console.error('Error fetching workouts:', error);
@@ -42,7 +43,10 @@ export const Workouts = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+    >
       <Text h4>Workouts</Text>
       {!workouts || workouts.length === 0 ? (
         <Text>No Workouts Found</Text>
@@ -54,17 +58,15 @@ export const Workouts = () => {
                 <ListItem.Title>{workout.workoutName}</ListItem.Title>
               </ListItem.Content>
               <ListItem.Content right>
-                <Icon
-                  name="arrow-forward"
-                  type="ionicon"
-                  size={15} /*style={styles.sidebarIcon} */
-                />
+                <Icon name="arrow-forward" type="ionicon" size={15} />
               </ListItem.Content>
             </ListItem>
           ))}
         </View>
       )}
-    </View>
+      <Button title="Refresh" onPress={() => refetch()} />
+      <Button title="Clear Workouts" onPress={handleClearAllWorkouts} />
+    </ScrollView>
   );
 };
 
