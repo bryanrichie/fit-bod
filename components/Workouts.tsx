@@ -1,84 +1,50 @@
 import { ListItem, Text, Icon, makeStyles } from '@rneui/themed';
 import { View, Alert } from 'react-native';
-import * as SQLite from 'expo-sqlite';
 import { useEffect, useState } from 'react';
-import { WorkoutType } from './AddWorkoutForm';
+import { getAllWorkouts, handleClearWorkouts } from '../hooks/db';
+import { WorkoutsType } from '@/hooks/types';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
 
 export const Workouts = () => {
+  // const queryClient = useQueryClient();
   const styles = useStyles();
+  const {
+    data: workouts,
+    isLoading,
+    isError,
+    error,
+  } = useQuery<WorkoutsType>({
+    queryKey: ['workouts'],
+    queryFn: getAllWorkouts,
+  });
+  // const [workouts, setWorkouts] = useState<WorkoutsType | undefined>();
 
-  // const listArr = [
-  //   {
-  //     id: 123,
-  //     name: 'Workout 1',
-  //     exercises: {
-  //       squat: {
-  //         sets: 3,
-  //         minReps: 8,
-  //         maxReps: 10,
-  //       },
-  //       benchPress: {
-  //         sets: 3,
-  //         minReps: 8,
-  //         maxReps: 10,
-  //       },
-  //       deadlift: {
-  //         sets: 3,
-  //         minReps: 8,
-  //         maxReps: 10,
-  //       },
-  //     },
-  //   },
-  //   {
-  //     id: 234,
-  //     name: 'Workout 2',
-  //     exercises: {
-  //       pullUp: {
-  //         sets: 3,
-  //         minReps: 8,
-  //         maxReps: 10,
-  //       },
-  //       pushUp: {
-  //         sets: 3,
-  //         minReps: 8,
-  //         maxReps: 10,
-  //       },
-  //       dip: {
-  //         sets: 3,
-  //         minReps: 8,
-  //         maxReps: 10,
-  //       },
-  //     },
-  //   },
-  // ];
+  // useEffect(() => {
+  //   handleClearWorkouts();
+  // }, []);
 
-  const [workouts, setWorkouts] = useState<WorkoutType[] | undefined>();
+  // queryClient.invalidateQueries({ queryKey: ['workouts'] });
 
-  const getAllWorkouts = async () => {
-    const db = await SQLite.openDatabaseAsync('databaseName');
+  console.log('workouts:', workouts);
 
-    const allRows: any = await db.getAllAsync('SELECT * FROM workouts ORDER BY id DESC');
+  if (isError) {
+    console.error('Error fetching workouts:', error);
+  }
 
-    setWorkouts(allRows);
-
-    Alert.alert('Retrieved Workouts', allRows[100].workoutName);
-  };
-
-  // const handleClearWorkouts = async () => {
-  //   const db = await SQLite.openDatabaseAsync('databaseName');
-
-  //   await db.execAsync('DELETE FROM workouts');
-  // };
-
-  useEffect(() => {
-    // handleClearWorkouts();
-    getAllWorkouts();
-  }, []);
+  if (isLoading) {
+    return <Text>Loading...</Text>;
+  }
 
   return (
     <View style={styles.container}>
       <Text h4>Workouts</Text>
-      {!workouts ? (
+      {!workouts || workouts.length === 0 ? (
         <Text>No Workouts Found</Text>
       ) : (
         <View style={styles.listContainer}>

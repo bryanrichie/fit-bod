@@ -1,45 +1,20 @@
 import { View, StyleSheet, Alert } from 'react-native';
 import { Button, Overlay, Text, Input, Divider, ListItem } from '@rneui/themed';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { titleizeString } from '@/hooks/utils';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
-import * as SQLite from 'expo-sqlite';
+import { saveWorkout } from '@/hooks/db';
+import { WorkoutType } from '@/hooks/types';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface Props {
   visible: boolean;
   handleToggleOverlay: () => void;
 }
 
-export type WorkoutType = {
-  workoutName: string;
-  exercises: { name: string }[];
-};
-
 export const AddWorkoutFormOverlay = ({ visible, handleToggleOverlay }: Props) => {
-  const handleSaveWorkout = async (workout: WorkoutType) => {
-    const { workoutName, exercises } = workout;
-    const formattedExercises = exercises.map((exercise) => exercise.name).join(', ');
-
-    const db = await SQLite.openDatabaseAsync('databaseName');
-
-    await db.execAsync(`
-      CREATE TABLE IF NOT EXISTS workouts (id INTEGER PRIMARY KEY AUTOINCREMENT, workoutName TEXT, exercises TEXT);
-    `);
-
-    const result = await db.runAsync(
-      'INSERT INTO workouts (workoutName, exercises) VALUES (?, ?)',
-      workoutName,
-      formattedExercises
-    );
-
-    // await db.execAsync(`
-    //   INSERT INTO workouts (workoutName, exercises) VALUES (${workoutName}, ${formattedExercises})
-    //   `);
-
-    Alert.alert('Saved Workout', String(result.changes));
-  };
-
+  const queryClient = useQueryClient();
   const {
     control,
     handleSubmit,
@@ -52,11 +27,21 @@ export const AddWorkoutFormOverlay = ({ visible, handleToggleOverlay }: Props) =
   });
   const workoutName = watch('workoutName');
   const [newExerciseName, setNewExerciseName] = useState<string>('');
-  const [workout, setWorkout] = useState<WorkoutType>({ workoutName: '', exercises: [] });
+  // const [workout, setWorkout] = useState<WorkoutType>({ workoutName: '', exercises: [] });
 
-  const handleOnSubmit = (data: WorkoutType) => {
-    setWorkout(data);
-    handleSaveWorkout(data);
+  const handleOnSubmit = async (data: WorkoutType) => {
+    try {
+      const res = await saveWorkout(data);
+
+      if (res > 0) {
+        // console.log('invalidate queries');
+        await queryClient.invalidateQueries({ queryKey: ['workouts'] });
+        handleToggleOverlay();
+        Alert.alert('Workout added successfully');
+      }
+    } catch (error) {
+      Alert.alert('Error saving workout, please try again');
+    }
   };
 
   const handleAddNewExercise = () => {
