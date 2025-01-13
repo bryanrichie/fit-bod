@@ -7,6 +7,7 @@ import { workoutsQueryKey } from '@/hooks/utils';
 import { useCallback, useState } from 'react';
 
 export const Workouts = () => {
+  const queryClient = useQueryClient();
   const [refreshing, setRefreshing] = useState(false);
   const styles = useStyles();
   const {
@@ -19,6 +20,7 @@ export const Workouts = () => {
     queryKey: [workoutsQueryKey],
     queryFn: getAllWorkouts,
     refetchOnWindowFocus: true,
+    staleTime: 0,
   });
 
   const onRefresh = useCallback(async () => {
@@ -28,6 +30,11 @@ export const Workouts = () => {
       setRefreshing(false);
     }, 2000);
   }, []);
+
+  const handleInvalidateWorkoutsQuery = async () => {
+    await queryClient.invalidateQueries({ queryKey: workoutsQueryKey });
+    console.log('workouts data:', workouts);
+  };
 
   const handleClearAllWorkouts = async () => {
     await clearAllWorkouts();
@@ -64,6 +71,7 @@ export const Workouts = () => {
           ))}
         </View>
       )}
+      <Button title="Invalidate" onPress={handleInvalidateWorkoutsQuery} />
       <Button title="Refresh" onPress={() => refetch()} />
       <Button title="Clear Workouts" onPress={handleClearAllWorkouts} />
     </ScrollView>
