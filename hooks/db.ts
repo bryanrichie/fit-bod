@@ -1,6 +1,7 @@
 import * as SQLite from 'expo-sqlite';
 import { WorkoutType, type WorkoutsType } from '../hooks/types';
-import { databaseName } from './utils';
+
+const databaseName = 'databaseName';
 
 export const getAllWorkouts = async () => {
   const db = await SQLite.openDatabaseAsync(databaseName);

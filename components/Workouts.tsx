@@ -1,44 +1,43 @@
 import { ListItem, Text, Icon, makeStyles } from '@rneui/themed';
-import { View, Button, ScrollView, RefreshControl } from 'react-native';
+import { Button, ScrollView, RefreshControl, View, Dimensions } from 'react-native';
 import { getAllWorkouts, clearAllWorkouts } from '../hooks/db';
 import { WorkoutsType } from '@/hooks/types';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { workoutsQueryKey } from '@/hooks/utils';
+import { useQuery } from '@tanstack/react-query';
+import { workoutsQueryKey } from '@/hooks/query';
 import { useCallback, useState } from 'react';
+import { invalidateWorkoutsQuery } from '../hooks/query';
+import { AddWorkoutFormOverlay } from './AddWorkoutForm';
 
 export const Workouts = () => {
-  const queryClient = useQueryClient();
-  const [refreshing, setRefreshing] = useState(false);
   const styles = useStyles();
+  const { height } = Dimensions.get('window');
   const {
     data: workouts,
     isLoading,
     isError,
     error,
-    refetch,
   } = useQuery<WorkoutsType>({
     queryKey: [workoutsQueryKey],
     queryFn: getAllWorkouts,
-    refetchOnWindowFocus: true,
-    staleTime: 0,
   });
+  const [refreshing, setRefreshing] = useState(false);
+  const [visible, setVisible] = useState<boolean>(false);
+
+  const handleToggleOverlay = () => {
+    setVisible((prev) => !prev);
+  };
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    refetch();
+    invalidateWorkoutsQuery();
     setTimeout(() => {
       setRefreshing(false);
     }, 2000);
   }, []);
 
-  const handleInvalidateWorkoutsQuery = async () => {
-    await queryClient.invalidateQueries({ queryKey: workoutsQueryKey });
-    console.log('workouts data:', workouts);
-  };
-
-  const handleClearAllWorkouts = async () => {
-    await clearAllWorkouts();
-    refetch();
+  const handleClearAllWorkouts = () => {
+    clearAllWorkouts();
+    invalidateWorkoutsQuery();
   };
 
   if (isError) {
@@ -55,25 +54,32 @@ export const Workouts = () => {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <Text h4>Workouts</Text>
-      {!workouts || workouts.length === 0 ? (
-        <Text>No Workouts Found</Text>
-      ) : (
-        <View style={styles.listContainer}>
-          {workouts.map((workout, i) => (
-            <ListItem key={i} bottomDivider>
-              <ListItem.Content>
-                <ListItem.Title>{workout.workoutName}</ListItem.Title>
-              </ListItem.Content>
-              <ListItem.Content right>
-                <Icon name="arrow-forward" type="ionicon" size={15} />
-              </ListItem.Content>
-            </ListItem>
-          ))}
-        </View>
-      )}
-      <Button title="Invalidate" onPress={handleInvalidateWorkoutsQuery} />
-      <Button title="Refresh" onPress={() => refetch()} />
-      <Button title="Clear Workouts" onPress={handleClearAllWorkouts} />
+      <View
+        style={{
+          gap: 5,
+        }}
+      >
+        {!workouts || workouts.length === 0 ? (
+          <Text>No Workouts Found</Text>
+        ) : (
+          <View style={styles.listContainer}>
+            {workouts.map((workout, i) => (
+              <ListItem key={i} bottomDivider>
+                <ListItem.Content>
+                  <ListItem.Title>{workout.workoutName}</ListItem.Title>
+                </ListItem.Content>
+                <ListItem.Content right>
+                  <Icon name="arrow-forward" type="ionicon" size={15} />
+                </ListItem.Content>
+              </ListItem>
+            ))}
+          </View>
+        )}
+        <Button title="Add Workout" onPress={handleToggleOverlay} />
+      </View>
+      {/* <Button title="Refresh" onPress={invalidateWorkoutsQuery} />
+      <Button title="Clear Workouts" onPress={handleClearAllWorkouts} /> */}
+      <AddWorkoutFormOverlay visible={visible} handleToggleOverlay={handleToggleOverlay} />
     </ScrollView>
   );
 };

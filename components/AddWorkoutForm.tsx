@@ -2,11 +2,12 @@ import { View, StyleSheet, Alert } from 'react-native';
 import { Button, Overlay, Text, Input, Divider, ListItem } from '@rneui/themed';
 import { useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { titleizeString, workoutsQueryKey } from '@/hooks/utils';
+import { titleizeString } from '@/hooks/utils';
+import { invalidateWorkoutsQuery } from '@/hooks/query';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { saveWorkout } from '@/hooks/db';
 import { WorkoutType } from '@/hooks/types';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 
 interface Props {
   visible: boolean;
@@ -15,7 +16,6 @@ interface Props {
 
 export const AddWorkoutFormOverlay = ({ visible, handleToggleOverlay }: Props) => {
   const mutation = useMutation({ mutationFn: saveWorkout });
-  const queryClient = useQueryClient();
   const {
     control,
     handleSubmit,
@@ -35,6 +35,7 @@ export const AddWorkoutFormOverlay = ({ visible, handleToggleOverlay }: Props) =
     mutation.mutate(workout, {
       onSuccess: (res) => {
         if (res > 0) {
+          invalidateWorkoutsQuery();
           handleToggleOverlay();
           reset();
           remove();
