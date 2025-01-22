@@ -1,70 +1,86 @@
 import { ListItem, Text, Icon, makeStyles } from '@rneui/themed';
-import { View } from 'react-native';
+import { Button, ScrollView, RefreshControl, View, Dimensions } from 'react-native';
+import { getAllWorkouts, clearAllWorkouts } from '../hooks/db';
+import { WorkoutsType } from '@/hooks/types';
+import { useQuery } from '@tanstack/react-query';
+import { workoutsQueryKey } from '@/hooks/query';
+import { useCallback, useState } from 'react';
+import { invalidateWorkoutsQuery } from '../hooks/query';
+import { AddWorkoutFormOverlay } from './AddWorkoutForm';
 
 export const Workouts = () => {
   const styles = useStyles();
+  const { height } = Dimensions.get('window');
+  const {
+    data: workouts,
+    isLoading,
+    isError,
+    error,
+  } = useQuery<WorkoutsType>({
+    queryKey: [workoutsQueryKey],
+    queryFn: getAllWorkouts,
+  });
+  const [refreshing, setRefreshing] = useState(false);
+  const [visible, setVisible] = useState<boolean>(false);
 
-  const listArr = [
-    {
-      id: 123,
-      name: 'Workout 1',
-      exercises: {
-        squat: {
-          sets: 3,
-          minReps: 8,
-          maxReps: 10,
-        },
-        benchPress: {
-          sets: 3,
-          minReps: 8,
-          maxReps: 10,
-        },
-        deadlift: {
-          sets: 3,
-          minReps: 8,
-          maxReps: 10,
-        },
-      },
-    },
-    {
-      id: 234,
-      name: 'Workout 2',
-      exercises: {
-        pullUp: {
-          sets: 3,
-          minReps: 8,
-          maxReps: 10,
-        },
-        pushUp: {
-          sets: 3,
-          minReps: 8,
-          maxReps: 10,
-        },
-        dip: {
-          sets: 3,
-          minReps: 8,
-          maxReps: 10,
-        },
-      },
-    },
-  ];
+  const handleToggleOverlay = () => {
+    setVisible((prev) => !prev);
+  };
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    invalidateWorkoutsQuery();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
+
+  const handleClearAllWorkouts = () => {
+    clearAllWorkouts();
+    invalidateWorkoutsQuery();
+  };
+
+  if (isError) {
+    console.error('Error fetching workouts:', error);
+  }
+
+  if (isLoading) {
+    return <Text>Loading...</Text>;
+  }
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+    >
       <Text h4>Workouts</Text>
-      <View style={styles.listContainer}>
-        {listArr.map((l, i) => (
-          <ListItem key={i} bottomDivider>
-            <ListItem.Content>
-              <ListItem.Title>{l.name}</ListItem.Title>
-            </ListItem.Content>
-            <ListItem.Content right>
-              <Icon name="arrow-forward" type="ionicon" size={15} /*style={styles.sidebarIcon}*/ />
-            </ListItem.Content>
-          </ListItem>
-        ))}
+      <View
+        style={{
+          gap: 5,
+        }}
+      >
+        {!workouts || workouts.length === 0 ? (
+          <Text>No Workouts Found</Text>
+        ) : (
+          <View style={styles.listContainer}>
+            {workouts.map((workout, i) => (
+              <ListItem key={i} bottomDivider>
+                <ListItem.Content>
+                  <ListItem.Title>{workout.workoutName}</ListItem.Title>
+                </ListItem.Content>
+                <ListItem.Content right>
+                  <Icon name="arrow-forward" type="ionicon" size={15} />
+                </ListItem.Content>
+              </ListItem>
+            ))}
+          </View>
+        )}
+        <Button title="Add Workout" onPress={handleToggleOverlay} />
       </View>
-    </View>
+      {/* <Button title="Refresh" onPress={invalidateWorkoutsQuery} />
+      <Button title="Clear Workouts" onPress={handleClearAllWorkouts} /> */}
+      <AddWorkoutFormOverlay visible={visible} handleToggleOverlay={handleToggleOverlay} />
+    </ScrollView>
   );
 };
 

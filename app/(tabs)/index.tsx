@@ -3,20 +3,23 @@ import { View, StyleSheet } from 'react-native';
 import { Button } from '@rneui/themed';
 import { useState } from 'react';
 import { AddWorkoutFormOverlay } from '@/components/AddWorkoutForm';
+import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
+
+export const queryClient = new QueryClient();
 
 export default function Tab() {
-  const [visible, setVisible] = useState<boolean>(false);
+  // const [visible, setVisible] = useState<boolean>(false);
 
-  const handleToggleOverlay = () => {
-    setVisible((prev) => !prev);
-  };
+  // const handleToggleOverlay = () => {
+  //   setVisible((prev) => !prev);
+  // };
 
   return (
-    <View style={styles.container}>
-      <Workouts />
-      <Button title="Add Workout" onPress={handleToggleOverlay} />
-      <AddWorkoutFormOverlay visible={visible} handleToggleOverlay={handleToggleOverlay} />
-    </View>
+    <QueryClientProvider client={queryClient}>
+      <View style={styles.container}>
+        <Workouts />
+      </View>
+    </QueryClientProvider>
   );
 }
 

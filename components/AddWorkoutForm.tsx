@@ -1,38 +1,52 @@
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import { Button, Overlay, Text, Input, Divider, ListItem } from '@rneui/themed';
 import { useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { titleizeString } from '@/hooks/utils';
+import { invalidateWorkoutsQuery } from '@/hooks/query';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import { saveWorkout } from '@/hooks/db';
+import { WorkoutType } from '@/hooks/types';
+import { useMutation } from '@tanstack/react-query';
 
 interface Props {
   visible: boolean;
   handleToggleOverlay: () => void;
 }
 
-type WorkoutType = {
-  workoutName: string;
-  exercises: { name: string }[];
-};
-
 export const AddWorkoutFormOverlay = ({ visible, handleToggleOverlay }: Props) => {
+  const mutation = useMutation({ mutationFn: saveWorkout });
   const {
     control,
     handleSubmit,
-    watch,
+    // watch,
+    reset,
     formState: { errors },
   } = useForm<WorkoutType>();
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'exercises',
   });
-  const workoutName = watch('workoutName');
+  // const workoutName = watch('workoutName');
   const [newExerciseName, setNewExerciseName] = useState<string>('');
-  const [savedWorkout, setSavedWorkout] = useState<WorkoutType>({ workoutName: '', exercises: [] });
+  // const [workout, setWorkout] = useState<WorkoutType>({ workoutName: '', exercises: [] });
 
-  const handleOnSubmit = (data: WorkoutType) => {
-    console.log('Saved workout:', data);
-    setSavedWorkout(data);
+  const handleOnSubmit = async (workout: WorkoutType) => {
+    mutation.mutate(workout, {
+      onSuccess: (res) => {
+        if (res > 0) {
+          invalidateWorkoutsQuery();
+          handleToggleOverlay();
+          reset();
+          remove();
+
+          Alert.alert('Workout added successfully');
+        }
+      },
+      onError: () => {
+        Alert.alert('Error saving workout, please try again');
+      },
+    });
   };
 
   const handleAddNewExercise = () => {
