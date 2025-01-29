@@ -7,6 +7,7 @@ import { workoutsQueryKey } from '@/hooks/query';
 import { useCallback, useState } from 'react';
 import { invalidateWorkoutsQuery } from '../hooks/query';
 import { AddWorkoutFormOverlay } from './AddWorkoutForm';
+import { Link } from 'expo-router';
 
 export const Workouts = () => {
   const styles = useStyles();
@@ -64,13 +65,20 @@ export const Workouts = () => {
         ) : (
           <View style={styles.listContainer}>
             {workouts.map((workout, i) => (
-              <ListItem key={i} bottomDivider>
+              <ListItem key={workout.id} bottomDivider>
                 <ListItem.Content>
                   <ListItem.Title>{workout.workoutName}</ListItem.Title>
                 </ListItem.Content>
-                <ListItem.Content right>
-                  <Icon name="arrow-forward" type="ionicon" size={15} />
-                </ListItem.Content>
+                <Link
+                  href={{
+                    pathname: '/workout/[id]',
+                    params: { id: workout.id },
+                  }}
+                >
+                  <ListItem.Content right>
+                    <Icon name="arrow-forward" type="ionicon" size={15} />
+                  </ListItem.Content>
+                </Link>
               </ListItem>
             ))}
           </View>

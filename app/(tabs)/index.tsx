@@ -8,12 +8,6 @@ import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/reac
 export const queryClient = new QueryClient();
 
 export default function Tab() {
-  // const [visible, setVisible] = useState<boolean>(false);
-
-  // const handleToggleOverlay = () => {
-  //   setVisible((prev) => !prev);
-  // };
-
   return (
     <QueryClientProvider client={queryClient}>
       <View style={styles.container}>

@@ -11,6 +11,16 @@ export const getAllWorkouts = async () => {
   return allRows;
 };
 
+export const getWorkout = async (id: number) => {
+  const db = await SQLite.openDatabaseAsync(databaseName);
+
+  const workout = (await db.getFirstAsync('SELECT * FROM workouts WHERE id = $id', {
+    $id: id,
+  })) as WorkoutType;
+
+  return workout;
+};
+
 export const saveWorkout = async (workout: WorkoutType) => {
   const { workoutName, exercises } = workout;
   const formattedExercises = exercises.map((exercise) => exercise.name).join(', ');
