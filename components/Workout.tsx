@@ -1,5 +1,5 @@
 import { getWorkout } from '@/hooks/db';
-import { workoutsQueryKey } from '@/hooks/query';
+import { workoutQueryKey } from '@/hooks/query';
 import { WorkoutType } from '@/hooks/types';
 import { useQuery } from '@tanstack/react-query';
 import { View, Text } from 'react-native';
@@ -11,7 +11,7 @@ export const Workout = ({ id }: { id: string }) => {
     isError,
     error,
   } = useQuery<WorkoutType>({
-    queryKey: [workoutsQueryKey],
+    queryKey: [workoutQueryKey],
     queryFn: () => getWorkout(Number(id)),
   });
 

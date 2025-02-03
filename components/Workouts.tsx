@@ -1,5 +1,5 @@
 import { ListItem, Text, Icon, makeStyles } from '@rneui/themed';
-import { Button, ScrollView, RefreshControl, View, Dimensions } from 'react-native';
+import { Button, ScrollView, RefreshControl, View } from 'react-native';
 import { getAllWorkouts, clearAllWorkouts } from '../hooks/db';
 import { WorkoutsType } from '@/hooks/types';
 import { useQuery } from '@tanstack/react-query';
@@ -11,7 +11,6 @@ import { Link } from 'expo-router';
 
 export const Workouts = () => {
   const styles = useStyles();
-  const { height } = Dimensions.get('window');
   const {
     data: workouts,
     isLoading,
@@ -23,6 +22,8 @@ export const Workouts = () => {
   });
   const [refreshing, setRefreshing] = useState(false);
   const [visible, setVisible] = useState<boolean>(false);
+
+  console.log('WORKOUTS:', workouts);
 
   const handleToggleOverlay = () => {
     setVisible((prev) => !prev);
