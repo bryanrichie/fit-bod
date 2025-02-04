@@ -19,6 +19,7 @@ export const Workout = ({ id }: { id: string }) => {
 
   if (isError) {
     console.error('Error fetching workout', error);
+    return;
   }
 
   if (isLoading) {

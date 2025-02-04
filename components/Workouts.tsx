@@ -44,6 +44,7 @@ export const Workouts = () => {
 
   if (isError) {
     console.error('Error fetching workouts:', error);
+    return;
   }
 
   if (isLoading) {
