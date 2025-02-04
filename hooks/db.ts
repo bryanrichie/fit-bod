@@ -1,5 +1,5 @@
 import * as SQLite from 'expo-sqlite';
-import { WorkoutType, type WorkoutsType } from '../hooks/types';
+import { GetWorkoutType, SaveWorkoutType, type WorkoutsType } from '../hooks/types';
 
 const databaseName = 'databaseName';
 
@@ -16,12 +16,12 @@ export const getWorkout = async (id: number) => {
 
   const workout = (await db.getFirstAsync('SELECT * FROM workouts WHERE id = $id', {
     $id: id,
-  })) as WorkoutType;
+  })) as GetWorkoutType;
 
   return workout;
 };
 
-export const saveWorkout = async (workout: WorkoutType) => {
+export const saveWorkout = async (workout: SaveWorkoutType) => {
   const { workoutName, exercises } = workout;
   const formattedExercises = exercises.map((exercise) => exercise.name).join(', ');
 

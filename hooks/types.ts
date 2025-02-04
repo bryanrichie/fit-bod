@@ -1,7 +1,10 @@
-export type WorkoutType = {
+type WorkoutBaseType<E> = {
   id: string;
   workoutName: string;
-  exercises: { name: string }[];
+  exercises: E;
 };
 
-export type WorkoutsType = WorkoutType[];
+export type SaveWorkoutType = WorkoutBaseType<{ name: string }[]>;
+export type GetWorkoutType = WorkoutBaseType<string>;
+
+export type WorkoutsType = GetWorkoutType[];

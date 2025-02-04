@@ -6,7 +6,7 @@ import { titleizeString } from '@/hooks/utils';
 import { invalidateWorkoutsQuery } from '@/hooks/query';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { saveWorkout } from '@/hooks/db';
-import { WorkoutType } from '@/hooks/types';
+import { SaveWorkoutType } from '@/hooks/types';
 import { useMutation } from '@tanstack/react-query';
 
 interface Props {
@@ -19,19 +19,16 @@ export const AddWorkoutFormOverlay = ({ visible, handleToggleOverlay }: Props) =
   const {
     control,
     handleSubmit,
-    // watch,
     reset,
     formState: { errors },
-  } = useForm<WorkoutType>();
+  } = useForm<SaveWorkoutType>();
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'exercises',
   });
-  // const workoutName = watch('workoutName');
   const [newExerciseName, setNewExerciseName] = useState<string>('');
-  // const [workout, setWorkout] = useState<WorkoutType>({ workoutName: '', exercises: [] });
 
-  const handleOnSubmit = async (workout: WorkoutType) => {
+  const handleOnSubmit = async (workout: SaveWorkoutType) => {
     mutation.mutate(workout, {
       onSuccess: (res) => {
         if (res > 0) {
