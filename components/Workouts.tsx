@@ -1,5 +1,5 @@
 import { ListItem, Text, Icon, makeStyles } from '@rneui/themed';
-import { Button, ScrollView, RefreshControl, View, Dimensions } from 'react-native';
+import { Button, ScrollView, RefreshControl, View } from 'react-native';
 import { getAllWorkouts, clearAllWorkouts } from '../hooks/db';
 import { WorkoutsType } from '@/hooks/types';
 import { useQuery } from '@tanstack/react-query';
@@ -7,10 +7,10 @@ import { workoutsQueryKey } from '@/hooks/query';
 import { useCallback, useState } from 'react';
 import { invalidateWorkoutsQuery } from '../hooks/query';
 import { AddWorkoutFormOverlay } from './AddWorkoutForm';
+import { Link } from 'expo-router';
 
 export const Workouts = () => {
   const styles = useStyles();
-  const { height } = Dimensions.get('window');
   const {
     data: workouts,
     isLoading,
@@ -22,6 +22,8 @@ export const Workouts = () => {
   });
   const [refreshing, setRefreshing] = useState(false);
   const [visible, setVisible] = useState<boolean>(false);
+
+  console.log('WORKOUTS:', workouts);
 
   const handleToggleOverlay = () => {
     setVisible((prev) => !prev);
@@ -42,6 +44,7 @@ export const Workouts = () => {
 
   if (isError) {
     console.error('Error fetching workouts:', error);
+    return;
   }
 
   if (isLoading) {
@@ -64,13 +67,20 @@ export const Workouts = () => {
         ) : (
           <View style={styles.listContainer}>
             {workouts.map((workout, i) => (
-              <ListItem key={i} bottomDivider>
+              <ListItem key={workout.id} bottomDivider>
                 <ListItem.Content>
                   <ListItem.Title>{workout.workoutName}</ListItem.Title>
                 </ListItem.Content>
-                <ListItem.Content right>
-                  <Icon name="arrow-forward" type="ionicon" size={15} />
-                </ListItem.Content>
+                <Link
+                  href={{
+                    pathname: '/workout/[id]',
+                    params: { id: workout.id },
+                  }}
+                >
+                  <ListItem.Content right>
+                    <Icon name="arrow-forward" type="ionicon" size={15} />
+                  </ListItem.Content>
+                </Link>
               </ListItem>
             ))}
           </View>
